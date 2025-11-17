@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "15428554147",
+    "firebase_url": "https://famora-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "famora",
+    "storage_bucket": "famora.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:15428554147:android:cdd95a139dc0503b2d1e16",
+        "android_client_info": {
+          "package_name": "famora.id.famora"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "15428554147-83iovn6tiu032dgj7fkaagshhfsrsf9g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZdcX8Cvw-jck7YrDC_pnRmncF64w2VLM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "15428554147-83iovn6tiu032dgj7fkaagshhfsrsf9g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
