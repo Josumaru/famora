@@ -1,3 +1,4 @@
+import 'package:famora/core/providers/navigation_provider.dart';
 import 'package:famora/core/themes/extensions/theme_ext.dart';
 import 'package:famora/features/chat/presentation/pages/chat_page.dart';
 import 'package:famora/features/home/presentation/pages/home_page.dart';
@@ -12,19 +13,21 @@ class NavigationPage extends HookConsumerWidget {
   const NavigationPage({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.read(navigationProvider);
     return PersistentTabView(
+      controller: controller,
       tabs: [
-        PersistentTabConfig(
-          screen: HomePage(),
-          item: ItemConfig(
-            activeForegroundColor: context.colorScheme.primary,
-            icon: Padding(
-              padding: const EdgeInsets.only(top: 3.0),
-              child: Icon(Iconsax.home_1_copy),
-            ),
-            title: "Home",
-          ),
-        ),
+        // PersistentTabConfig(
+        //   screen: HomePage(),
+        //   item: ItemConfig(
+        //     activeForegroundColor: context.colorScheme.primary,
+        //     icon: Padding(
+        //       padding: const EdgeInsets.only(top: 3.0),
+        //       child: Icon(Iconsax.home_1_copy),
+        //     ),
+        //     title: "Home",
+        //   ),
+        // ),
         PersistentTabConfig(
           screen: ChatPage(),
           item: ItemConfig(
@@ -68,16 +71,6 @@ class NavigationPage extends HookConsumerWidget {
             ),
           ),
           color: context.colorScheme.surface,
-          // padding: EdgeInsets.only(top: 20),
-          // borderRadius: BorderRadius.only(
-          //   topLeft: Radius.circular(40),
-          //   topRight: Radius.circular(40),
-          // ),
-          // border: BoxBorder.fromLTRB(
-          //   top: BorderSide(
-          //     color: context.colorScheme.primary.withValues(alpha: 0.3),
-          //   ),
-          // ),
         ),
       ),
     );

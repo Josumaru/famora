@@ -1,126 +1,139 @@
+import 'package:famora/core/providers/firebase_provider.dart';
+import 'package:famora/core/providers/location_provider.dart';
+import 'package:famora/core/services/directions_service.dart';
+import 'package:famora/core/services/voice_service.dart';
+import 'package:famora/core/utils/loading.dart';
 import 'package:famora/core/utils/logger.dart';
 import 'package:famora/core/utils/marker.dart';
+import 'package:famora/features/auth/presentation/providers/auth_provider.dart';
 import 'package:famora/features/home/domain/entities/member_entity.dart';
 import 'package:famora/features/home/presentation/providers/group_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:latlong2/latlong.dart' as osm;
 
 class MonitorPage extends HookConsumerWidget {
   const MonitorPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    useEffect(() {
+      Future<void> initPermission() async {
+        await requestVoicePermissions();
+      }
+
+      initPermission();
+      return null;
+    }, []);
     final groupAsync = ref.watch(monitorProvider);
+    final user = ref.watch(firebaseAuthProvider).currentUser;
+    final userLocationAsync = ref.watch(userLocationStreamProvider);
 
     return groupAsync.when(
+      loading: () => Center(child: showLoading(context)),
+      error: (e, _) => Center(child: Text(e.toString())),
       data: (groupData) {
-        final groupId = groupData?.group.id;
-
-        final filtered = groupData?.members
-            .where((loc) => loc.groupId == groupId)
+        final members = groupData?.members
+            .where((m) => m.userId != user?.uid)
             .toList();
 
-        if (filtered == null || filtered.isEmpty) {
-          return const Center(
-            child: Text('Tidak ada lokasi anggota dalam grup ini.'),
-          );
+        if (members == null || members.isEmpty) {
+          return const Center(child: Text('Tidak ada anggota untuk dimonitor'));
         }
 
-        // Tentukan center map (fallback Jakarta)
-        final center = filtered.first.lat != null
-            ? LatLng(filtered.first.lat!, filtered.first.lng!)
-            : const LatLng(-6.2, 106.8);
+        return userLocationAsync.when(
+          loading: () => Center(child: showLoading(context)),
+          error: (e, _) => Center(child: Text(e.toString())),
+          data: (userPos) {
+            return FutureBuilder(
+              future: buildRealtimeMapData(userPos, members),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(child: showLoading(context));
+                }
 
-        return FutureBuilder(
-          future: Future.wait([
-            getCurrentPosition(), // posisi user saat ini
-            buildMarkers(filtered), // build marker semua member
-          ]),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            }
+                final markers = snapshot.data!.$1;
+                final polylines = snapshot.data!.$2;
 
-            final userPosition = snapshot.data![0] as LatLng?;
-            final markers = snapshot.data![1] as Set<Marker>;
-            logger.d(userPosition);
-            logger.d(markers);
-
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 55),
-              child: GoogleMap(
-                markers: markers,
-                myLocationEnabled: true,
-                initialCameraPosition: CameraPosition(
-                  target: userPosition!,
-                  zoom: 14,
-                ),
-
-                // Tambahkan polyline di sini ✨
-                polylines: buildPolylines(userPosition, filtered),
-              ),
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 55),
+                  child: GoogleMap(
+                    myLocationEnabled: true,
+                    initialCameraPosition: CameraPosition(
+                      target: userPos,
+                      zoom: 14,
+                    ),
+                    markers: markers,
+                    polylines: polylines,
+                  ),
+                );
+              },
             );
           },
         );
       },
-
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, _) => Center(child: Text('Error: $err')),
     );
   }
 }
 
-Future<Set<Marker>> buildMarkers(List<MemberEntity> filtered) async {
-  final Set<Marker> markers = {};
+Future<(Set<Marker>, Set<Polyline>)> buildRealtimeMapData(
+  LatLng userPos,
+  List<MemberEntity> members,
+) async {
+  final markers = <Marker>{};
+  final polylines = <Polyline>{};
 
-  for (final loc in filtered) {
-    final iconBytes = await getRoundedMarker(loc.avatar ?? "");
+  for (final m in members) {
+    if (m.lat == null || m.lng == null) continue;
 
+    // MARKER
+    final iconBytes = await getRoundedMarker(m.avatar ?? "");
     markers.add(
       Marker(
-        markerId: MarkerId(loc.userId ?? ""),
-        position: LatLng(loc.lat ?? 0, loc.lng ?? 0),
+        markerId: MarkerId(m.userId ?? ''),
+        position: LatLng(m.lat!, m.lng!),
         icon: BitmapDescriptor.fromBytes(iconBytes),
-        infoWindow: InfoWindow(title: loc.name),
+        infoWindow: InfoWindow(title: m.name),
+      ),
+    );
+
+    // OSM ROUTE
+    final route = await getOSMRoute(
+      osm.LatLng(userPos.latitude, userPos.longitude),
+      osm.LatLng(m.lat!, m.lng!),
+    );
+
+    if (route.isEmpty) continue;
+
+    final googlePoints = convertToGoogleLatLng(route);
+
+    polylines.add(
+      Polyline(
+        polylineId: PolylineId('route-${m.userId}'),
+        points: googlePoints,
+        width: 4,
+        color: Colors.red,
       ),
     );
   }
 
-  return markers;
+  return (markers, polylines);
 }
 
-Set<Polyline> buildPolylines(LatLng userPos, List<MemberEntity> members) {
-  final Set<Polyline> polylines = {};
-
-  for (final m in members) {
-    if (m.lat != null && m.lng != null) {
-      polylines.add(
-        Polyline(
-          polylineId: PolylineId("line-${m.userId}"),
-          width: 4,
-          color: Color.fromARGB(255, 78, 187, 241),
-          points: [userPos, LatLng(m.lat!, m.lng!)],
-        ),
-      );
-    }
-  }
-
-  return polylines;
-}
-
-Future<LatLng?> getCurrentPosition() async {
-  LocationPermission permission = await Geolocator.checkPermission();
+final userLocationStreamProvider = StreamProvider<LatLng>((ref) async* {
+  final permission = await Geolocator.checkPermission();
   if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
+    await Geolocator.requestPermission();
   }
 
-  if (permission == LocationPermission.deniedForever ||
-      permission == LocationPermission.denied) {
-    return null;
-  }
-
-  final pos = await Geolocator.getCurrentPosition();
-  return LatLng(pos.latitude, pos.longitude);
-}
+  yield* Geolocator.getPositionStream(
+    locationSettings: const LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 5, // update tiap 5 meter
+    ),
+  ).map((pos) => LatLng(pos.latitude, pos.longitude));
+});

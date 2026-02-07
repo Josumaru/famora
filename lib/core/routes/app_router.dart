@@ -1,5 +1,8 @@
 import 'package:famora/core/providers/toast_provider.dart';
+import 'package:famora/features/chat/presentation/pages/chat_detail_page.dart';
 import 'package:famora/features/create/presentation/pages/create_page.dart';
+import 'package:famora/features/create/presentation/pages/join_page.dart';
+import 'package:famora/features/home/presentation/pages/add_member_page.dart';
 import 'package:famora/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:famora/features/splash/presentation/pages/splash_page.dart';
 import 'package:go_router/go_router.dart';
@@ -34,6 +37,23 @@ class AppRouter {
         GoRoute(
           path: RouteName.create,
           builder: (context, state) => const CreatePage(),
+        ),
+        GoRoute(
+          path: ChatDetailPage.path,
+          builder: (context, state) => const ChatDetailPage(),
+        ),
+        GoRoute(
+          path: AddMemberPage.path,
+          builder: (context, state) {
+            final args = (state.extra ?? "") as String;
+            return AddMemberPage(qrcode: args);
+          },
+        ),
+        GoRoute(
+          path: JoinPage.path,
+          builder: (context, state) {
+            return JoinPage();
+          },
         ),
       ],
     );

@@ -1,7 +1,4 @@
-import 'package:delightful_toast/delight_toast.dart';
-import 'package:delightful_toast/toast/components/toast_card.dart';
-import 'package:famora/core/providers/toast_provider.dart';
-import 'package:famora/core/themes/extensions/theme_ext.dart';
+import 'package:famora/core/utils/logger.dart';
 import 'package:famora/features/create/presentation/widgets/create_widget.dart';
 import 'package:famora/features/create/presentation/widgets/join_widget.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +8,7 @@ import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 class CreatePage extends HookConsumerWidget {
   const CreatePage({super.key});
+  static String path = "/create_group";
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
@@ -80,7 +78,7 @@ void showModal(
       }
     },
     onModalDismissedWithBarrierTap: () {
-      debugPrint('Closed modal sheet with barrier tap');
+      logger.d('Closed modal sheet with barrier tap');
       Navigator.of(context).pop();
     },
   );

@@ -6,18 +6,16 @@ class OnboardingGradientWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned.fill(
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.bottomCenter,
-            end: Alignment.topCenter,
-            colors: [
-              context.colorScheme.surface.withValues(alpha: 1),
-              context.colorScheme.surface.withValues(alpha: 0.2),
-              context.colorScheme.surface.withValues(alpha: 1),
-            ],
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+          colors: [
+            context.colorScheme.surface.withValues(alpha: 1),
+            context.colorScheme.surface.withValues(alpha: 0.2),
+            context.colorScheme.surface.withValues(alpha: 1),
+          ],
         ),
       ),
     );

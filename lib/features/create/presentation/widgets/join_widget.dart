@@ -1,8 +1,11 @@
 import 'package:famora/core/providers/firebase_provider.dart';
 import 'package:famora/core/providers/toast_provider.dart';
+import 'package:famora/core/themes/extensions/theme_ext.dart';
+import 'package:famora/core/utils/logger.dart';
+import 'package:famora/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 import 'package:go_router/go_router.dart';
 
@@ -12,7 +15,7 @@ bool loading = false;
 SliverWoltModalSheetPage joinWidget(WidgetRef ref, BuildContext context) {
   return WoltModalSheetPage(
     hasSabGradient: false,
-    topBarTitle: Text('Masukan Kode Undangan'),
+    topBarTitle: Text('Scan Kode Undangan'),
     isTopBarLayerAlwaysVisible: true,
     trailingNavBarWidget: IconButton(
       padding: const EdgeInsets.all(16),
@@ -20,51 +23,30 @@ SliverWoltModalSheetPage joinWidget(WidgetRef ref, BuildContext context) {
       onPressed: Navigator.of(context).pop,
     ),
     child: Padding(
-      padding: EdgeInsets.all(8.0),
-      child: Column(
-        spacing: 8,
-        children: [
-          TextField(
-            controller: _controller,
-            decoration: InputDecoration(
-              labelText: 'Kode',
-              prefixIcon: Icon(Iconsax.chart_copy),
-              suffixIcon: Icon(Iconsax.scan_barcode_copy),
+      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: context.colorScheme.onSurface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: context.colorScheme.onSurface.withOpacity(0.1),
+            width: 1,
+          ),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: AspectRatio(
+            aspectRatio: 1 / 1,
+            child: MobileScanner(
+              onDetect: (capture) {
+                final barcode = capture.barcodes.first;
+                if (barcode.rawValue != null) {
+                  joinFamilyGroup(ref, barcode.rawValue!, context);
+                }
+              },
             ),
           ),
-          Row(
-            spacing: 8,
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: Navigator.of(context).pop,
-                  child: const SizedBox(
-                    width: double.infinity,
-                    child: Center(child: Text('Batal')),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    FocusScope.of(context).unfocus();
-                    loading = false;
-                    if (!loading) {
-                      joinFamilyGroup(ref, _controller.text, context);
-                    } else {
-                      return;
-                    }
-                  },
-
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: Center(child: Text(loading ? 'Gabung' : 'Tunggu')),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
     ),
   );
@@ -75,7 +57,7 @@ void joinFamilyGroup(
   String groupId,
   BuildContext context,
 ) async {
-  final user = ref.read(firebaseUserProvider);
+  final user = ref.read(firebaseAuthProvider).currentUser;
   final database = ref.read(databaseProvider);
   if (user == null) {
     ref.read(toastServiceProvider).showError("Kamu belum login");
@@ -105,9 +87,9 @@ void joinFamilyGroup(
 
     await database.child("members").child(key).update({"groupId": groupId});
 
-    print("✅ groupId berhasil diupdate!");
+    logger.d("✅ groupId berhasil diupdate!");
   } else {
-    print("❌ Data user belum ada di members.");
+    logger.e("❌ Data user belum ada di members.");
   }
   loading = false;
 

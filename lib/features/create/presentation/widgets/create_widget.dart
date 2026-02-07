@@ -1,5 +1,6 @@
 import 'package:famora/core/providers/firebase_provider.dart';
 import 'package:famora/core/providers/toast_provider.dart';
+import 'package:famora/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -62,7 +63,7 @@ SliverWoltModalSheetPage createWidget(WidgetRef ref, BuildContext context) {
 }
 
 void createFamilyGroup(WidgetRef ref, String name, BuildContext context) async {
-  final user = ref.read(firebaseUserProvider);
+  final user = ref.read(firebaseAuthProvider).currentUser;
   final database = ref.read(databaseProvider);
   if (user == null) {
     ref.read(toastServiceProvider).showError("Kamu belum login");

@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$MemberModel {
 
- DateTime? get createdAt; String? get groupId; String? get id; String? get name; String? get avatar; String? get userId; double? get lat; double? get lng;
+ DateTime? get createdAt; String? get groupId; String? get id; String? get name; String? get avatar; String? get userId; String? get fcmToken; double? get lat; double? get lng;
 /// Create a copy of MemberModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $MemberModelCopyWith<MemberModel> get copyWith => _$MemberModelCopyWithImpl<Memb
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MemberModel&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.groupId, groupId) || other.groupId == groupId)&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.avatar, avatar) || other.avatar == avatar)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MemberModel&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.groupId, groupId) || other.groupId == groupId)&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.avatar, avatar) || other.avatar == avatar)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.fcmToken, fcmToken) || other.fcmToken == fcmToken)&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,createdAt,groupId,id,name,avatar,userId,lat,lng);
+int get hashCode => Object.hash(runtimeType,createdAt,groupId,id,name,avatar,userId,fcmToken,lat,lng);
 
 @override
 String toString() {
-  return 'MemberModel(createdAt: $createdAt, groupId: $groupId, id: $id, name: $name, avatar: $avatar, userId: $userId, lat: $lat, lng: $lng)';
+  return 'MemberModel(createdAt: $createdAt, groupId: $groupId, id: $id, name: $name, avatar: $avatar, userId: $userId, fcmToken: $fcmToken, lat: $lat, lng: $lng)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $MemberModelCopyWith<$Res>  {
   factory $MemberModelCopyWith(MemberModel value, $Res Function(MemberModel) _then) = _$MemberModelCopyWithImpl;
 @useResult
 $Res call({
- DateTime? createdAt, String? groupId, String? id, String? name, String? avatar, String? userId, double? lat, double? lng
+ DateTime? createdAt, String? groupId, String? id, String? name, String? avatar, String? userId, String? fcmToken, double? lat, double? lng
 });
 
 
@@ -65,7 +65,7 @@ class _$MemberModelCopyWithImpl<$Res>
 
 /// Create a copy of MemberModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? createdAt = freezed,Object? groupId = freezed,Object? id = freezed,Object? name = freezed,Object? avatar = freezed,Object? userId = freezed,Object? lat = freezed,Object? lng = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? createdAt = freezed,Object? groupId = freezed,Object? id = freezed,Object? name = freezed,Object? avatar = freezed,Object? userId = freezed,Object? fcmToken = freezed,Object? lat = freezed,Object? lng = freezed,}) {
   return _then(_self.copyWith(
 createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,groupId: freezed == groupId ? _self.groupId : groupId // ignore: cast_nullable_to_non_nullable
@@ -73,6 +73,7 @@ as String?,id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nul
 as String?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
 as String?,userId: freezed == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
+as String?,fcmToken: freezed == fcmToken ? _self.fcmToken : fcmToken // ignore: cast_nullable_to_non_nullable
 as String?,lat: freezed == lat ? _self.lat : lat // ignore: cast_nullable_to_non_nullable
 as double?,lng: freezed == lng ? _self.lng : lng // ignore: cast_nullable_to_non_nullable
 as double?,
@@ -160,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( DateTime? createdAt,  String? groupId,  String? id,  String? name,  String? avatar,  String? userId,  double? lat,  double? lng)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( DateTime? createdAt,  String? groupId,  String? id,  String? name,  String? avatar,  String? userId,  String? fcmToken,  double? lat,  double? lng)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MemberModel() when $default != null:
-return $default(_that.createdAt,_that.groupId,_that.id,_that.name,_that.avatar,_that.userId,_that.lat,_that.lng);case _:
+return $default(_that.createdAt,_that.groupId,_that.id,_that.name,_that.avatar,_that.userId,_that.fcmToken,_that.lat,_that.lng);case _:
   return orElse();
 
 }
@@ -181,10 +182,10 @@ return $default(_that.createdAt,_that.groupId,_that.id,_that.name,_that.avatar,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( DateTime? createdAt,  String? groupId,  String? id,  String? name,  String? avatar,  String? userId,  double? lat,  double? lng)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( DateTime? createdAt,  String? groupId,  String? id,  String? name,  String? avatar,  String? userId,  String? fcmToken,  double? lat,  double? lng)  $default,) {final _that = this;
 switch (_that) {
 case _MemberModel():
-return $default(_that.createdAt,_that.groupId,_that.id,_that.name,_that.avatar,_that.userId,_that.lat,_that.lng);case _:
+return $default(_that.createdAt,_that.groupId,_that.id,_that.name,_that.avatar,_that.userId,_that.fcmToken,_that.lat,_that.lng);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -201,10 +202,10 @@ return $default(_that.createdAt,_that.groupId,_that.id,_that.name,_that.avatar,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( DateTime? createdAt,  String? groupId,  String? id,  String? name,  String? avatar,  String? userId,  double? lat,  double? lng)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( DateTime? createdAt,  String? groupId,  String? id,  String? name,  String? avatar,  String? userId,  String? fcmToken,  double? lat,  double? lng)?  $default,) {final _that = this;
 switch (_that) {
 case _MemberModel() when $default != null:
-return $default(_that.createdAt,_that.groupId,_that.id,_that.name,_that.avatar,_that.userId,_that.lat,_that.lng);case _:
+return $default(_that.createdAt,_that.groupId,_that.id,_that.name,_that.avatar,_that.userId,_that.fcmToken,_that.lat,_that.lng);case _:
   return null;
 
 }
@@ -216,7 +217,7 @@ return $default(_that.createdAt,_that.groupId,_that.id,_that.name,_that.avatar,_
 @JsonSerializable()
 
 class _MemberModel implements MemberModel {
-  const _MemberModel({this.createdAt, this.groupId, this.id, this.name, this.avatar, this.userId, this.lat, this.lng});
+  const _MemberModel({this.createdAt, this.groupId, this.id, this.name, this.avatar, this.userId, this.fcmToken, this.lat, this.lng});
   factory _MemberModel.fromJson(Map<String, dynamic> json) => _$MemberModelFromJson(json);
 
 @override final  DateTime? createdAt;
@@ -225,6 +226,7 @@ class _MemberModel implements MemberModel {
 @override final  String? name;
 @override final  String? avatar;
 @override final  String? userId;
+@override final  String? fcmToken;
 @override final  double? lat;
 @override final  double? lng;
 
@@ -241,16 +243,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MemberModel&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.groupId, groupId) || other.groupId == groupId)&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.avatar, avatar) || other.avatar == avatar)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MemberModel&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.groupId, groupId) || other.groupId == groupId)&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.avatar, avatar) || other.avatar == avatar)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.fcmToken, fcmToken) || other.fcmToken == fcmToken)&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,createdAt,groupId,id,name,avatar,userId,lat,lng);
+int get hashCode => Object.hash(runtimeType,createdAt,groupId,id,name,avatar,userId,fcmToken,lat,lng);
 
 @override
 String toString() {
-  return 'MemberModel(createdAt: $createdAt, groupId: $groupId, id: $id, name: $name, avatar: $avatar, userId: $userId, lat: $lat, lng: $lng)';
+  return 'MemberModel(createdAt: $createdAt, groupId: $groupId, id: $id, name: $name, avatar: $avatar, userId: $userId, fcmToken: $fcmToken, lat: $lat, lng: $lng)';
 }
 
 
@@ -261,7 +263,7 @@ abstract mixin class _$MemberModelCopyWith<$Res> implements $MemberModelCopyWith
   factory _$MemberModelCopyWith(_MemberModel value, $Res Function(_MemberModel) _then) = __$MemberModelCopyWithImpl;
 @override @useResult
 $Res call({
- DateTime? createdAt, String? groupId, String? id, String? name, String? avatar, String? userId, double? lat, double? lng
+ DateTime? createdAt, String? groupId, String? id, String? name, String? avatar, String? userId, String? fcmToken, double? lat, double? lng
 });
 
 
@@ -278,7 +280,7 @@ class __$MemberModelCopyWithImpl<$Res>
 
 /// Create a copy of MemberModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? createdAt = freezed,Object? groupId = freezed,Object? id = freezed,Object? name = freezed,Object? avatar = freezed,Object? userId = freezed,Object? lat = freezed,Object? lng = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? createdAt = freezed,Object? groupId = freezed,Object? id = freezed,Object? name = freezed,Object? avatar = freezed,Object? userId = freezed,Object? fcmToken = freezed,Object? lat = freezed,Object? lng = freezed,}) {
   return _then(_MemberModel(
 createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,groupId: freezed == groupId ? _self.groupId : groupId // ignore: cast_nullable_to_non_nullable
@@ -286,6 +288,7 @@ as String?,id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nul
 as String?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
 as String?,userId: freezed == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
+as String?,fcmToken: freezed == fcmToken ? _self.fcmToken : fcmToken // ignore: cast_nullable_to_non_nullable
 as String?,lat: freezed == lat ? _self.lat : lat // ignore: cast_nullable_to_non_nullable
 as double?,lng: freezed == lng ? _self.lng : lng // ignore: cast_nullable_to_non_nullable
 as double?,

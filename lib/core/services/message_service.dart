@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:famora/core/utils/logger.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -28,7 +29,7 @@ class MessageService {
 
     // Get FCM token
     final token = await _messaging.getToken();
-    print('FCM Token: $token');
+    logger.d('FCM Token: $token');
   }
 
   Future<void> _requestPermission() async {
@@ -42,7 +43,7 @@ class MessageService {
       criticalAlert: false,
     );
 
-    print('Permission status: ${settings.authorizationStatus}');
+    logger.d('Permission status: ${settings.authorizationStatus}');
   }
 
   Future<void> setupFlutterNotifications() async {

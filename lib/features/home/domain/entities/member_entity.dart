@@ -4,6 +4,7 @@ class MemberEntity {
   final String? groupId;
   final String? name;
   final String? avatar;
+  final String? fcmToken;
   final double? lat;
   final double? lng;
   final DateTime? createdAt;
@@ -17,5 +18,6 @@ class MemberEntity {
     this.avatar,
     this.lat,
     this.lng,
+    this.fcmToken,
   });
 }

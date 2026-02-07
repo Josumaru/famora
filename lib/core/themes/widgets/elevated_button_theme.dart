@@ -7,14 +7,14 @@ class TElevatedButtonTheme {
     return ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         elevation: 0,
-        foregroundColor: colors.onPrimary,
+        foregroundColor: colors.surface,
         backgroundColor: colors.primary,
-        shadowColor: colors.surface,
+        shadowColor: Colors.transparent,
         disabledBackgroundColor: Colors.grey,
         disabledForegroundColor: Colors.grey,
         side: BorderSide(color: colors.primary),
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-        textStyle: TTextTheme.getTextTheme(colors).titleLarge,
+        textStyle: TTextTheme.getTextTheme(colors).titleMedium,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(64)),
       ),
     );

@@ -7,15 +7,11 @@ class OnboardingPageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned.fill(
-      child: PageView.builder(
-        controller: controller,
-        itemBuilder: (context, index) => Positioned.fill(
-          child: Image.asset(
-            "assets/images/onboarding/onboarding_${index + 1}.png",
-            fit: BoxFit.cover,
-          ),
-        ),
+    return PageView.builder(
+      controller: controller,
+      itemBuilder: (context, index) => Image.asset(
+        "assets/images/onboarding/onboarding_${index + 1}.png",
+        fit: BoxFit.cover,
       ),
     );
   }

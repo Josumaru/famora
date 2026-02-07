@@ -14,7 +14,7 @@ dependencies {
 }
 android {
     namespace = "famora.id.famora"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 36
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -32,7 +32,7 @@ android {
         applicationId = "famora.id.famora"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 23
+        minSdk = 29
         targetSdk = 33
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -44,6 +44,12 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = false
+            isShrinkResources = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }
@@ -51,3 +57,18 @@ android {
 flutter {
     source = "../.."
 }
+
+// sourceSets {
+//     getByName("main") {
+//         jniLibs.srcDirs("src/main/jniLibs")
+//     }
+// }
+// packagingOptions {
+    //     pickFirsts += setOf(
+        //         "lib/armeabi-v7a/libc++_shared.so",
+        //         "lib/arm64-v8a/libc++_shared.so",
+        //         "lib/x86/libc++_shared.so",
+        //         "lib/x86_64/libc++_shared.so",
+        //         "**/libc++_shared.so"
+        //     )
+// }

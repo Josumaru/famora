@@ -15,6 +15,7 @@ _MemberModel _$MemberModelFromJson(Map<String, dynamic> json) => _MemberModel(
   name: json['name'] as String?,
   avatar: json['avatar'] as String?,
   userId: json['userId'] as String?,
+  fcmToken: json['fcmToken'] as String?,
   lat: (json['lat'] as num?)?.toDouble(),
   lng: (json['lng'] as num?)?.toDouble(),
 );
@@ -27,6 +28,7 @@ Map<String, dynamic> _$MemberModelToJson(_MemberModel instance) =>
       'name': instance.name,
       'avatar': instance.avatar,
       'userId': instance.userId,
+      'fcmToken': instance.fcmToken,
       'lat': instance.lat,
       'lng': instance.lng,
     };

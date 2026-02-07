@@ -22,6 +22,7 @@ abstract class MemberModel with _$MemberModel {
     String? name,
     String? avatar,
     String? userId,
+    String? fcmToken,
     double? lat,
     double? lng,
   }) = _MemberModel;

@@ -7,14 +7,13 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application
-        android:label="famora"
+        android:label="Famora"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
@@ -24,7 +23,6 @@
             tools:replace="android:exported" 
             android:exported="false" />
 
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBnlw2oKHxYwXhyePJxzk2XGGIORYkyx7s"
@@ -32,9 +30,9 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:launchMode="singleTop"
             android:taskAffinity=""
             android:showWhenLocked="true"
+            android:launchMode="singleInstance"
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"

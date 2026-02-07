@@ -27,7 +27,7 @@ final groupProvider = FutureProvider<GroupMemberEntity?>((ref) async {
     memberSnap.children.first.value as Map,
   );
   logger.d(firstMemberData);
-  final groupId = firstMemberData["id"];
+  final groupId = firstMemberData["groupId"];
   if (groupId == null) return null;
 
   final groupSnap = await database.child("groups/$groupId").get();
@@ -63,6 +63,7 @@ final groupProvider = FutureProvider<GroupMemberEntity?>((ref) async {
       avatar: member.avatar,
       lat: member.lat,
       lng: member.lng,
+      fcmToken: member.fcmToken,
     );
   }).toList();
 

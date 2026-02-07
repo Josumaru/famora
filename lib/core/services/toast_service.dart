@@ -1,6 +1,8 @@
 import 'package:delightful_toast/delight_toast.dart';
 import 'package:delightful_toast/toast/components/toast_card.dart';
+import 'package:delightful_toast/toast/utils/enums.dart';
 import 'package:famora/core/themes/extensions/theme_ext.dart';
+import 'package:famora/core/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
@@ -22,9 +24,12 @@ class ToastService {
           color: background,
           title: Text(message),
         ),
+        position: DelightSnackbarPosition.top,
+        autoDismiss: true,
+        snackbarDuration: Duration(seconds: 2),
       ).show(context);
     } else {
-      debugPrint("Gagal menampilkan toast: context null");
+      logger.e("Gagal menampilkan toast: context null");
     }
   }
 

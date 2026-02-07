@@ -1,3 +1,4 @@
+import 'package:famora/core/utils/logger.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -32,6 +33,7 @@ class AuthController {
     required String email,
     required String password,
   }) {
+    logger.e({email, password});
     return _auth.signInWithEmailAndPassword(email: email, password: password);
   }
 

@@ -7,4 +7,5 @@ class RouteName {
   static const create = '/create';
   static const stream = '/stream';
   static const splash = '/splash';
+  static const voiceActivation = "/voice-activation";
 }
