@@ -26,7 +26,7 @@ final groupProvider = FutureProvider<GroupMemberEntity?>((ref) async {
   final firstMemberData = Map<String, dynamic>.from(
     memberSnap.children.first.value as Map,
   );
-  logger.d(firstMemberData);
+  // logger.d(firstMemberData);
   final groupId = firstMemberData["groupId"];
   if (groupId == null) return null;
 

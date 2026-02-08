@@ -9,8 +9,12 @@ import 'package:famora/core/utils/logger.dart';
 import 'package:famora/features/auth/presentation/providers/auth_provider.dart';
 import 'package:famora/features/home/presentation/pages/add_member_page.dart';
 import 'package:famora/features/home/presentation/providers/group_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:go_router/go_router.dart';
@@ -40,6 +44,64 @@ class SettingPage extends HookConsumerWidget {
       return null;
     }, [voice.keyword]);
 
+    Future<void> handleChangeKey() async {
+      final text = controller.text;
+      await ref.read(voiceProvider.notifier).setKeyword(text);
+
+      if (voice.enabled) {
+        await ref.read(voiceProvider.notifier).toggle(false);
+        await Future.delayed(const Duration(seconds: 3));
+        await ref.read(voiceProvider.notifier).toggle(true);
+      }
+      await Future.delayed(const Duration(seconds: 5));
+      final instance = FirebaseDatabase.instanceFor(
+        app: Firebase.app(),
+        databaseURL: dotenv.env['FIREBASE_DB_URL'],
+      );
+      final db = instance.ref();
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      final user = FirebaseAuth.instance.currentUser;
+
+      final userSnapshot = await db.child('members/$uid').get();
+
+      logger.f("userSnapshot: ${userSnapshot.value}");
+
+      if (!userSnapshot.exists) return;
+
+      // final userEntry = (userSnapshot.snapshot.value as Map).entries.first;
+      final data = Map<String, dynamic>.from(userSnapshot.value as Map);
+      final groupId = data['groupId'];
+      final snapshot = await db
+          .child('members')
+          .orderByChild('groupId')
+          .equalTo(groupId)
+          .get();
+
+      if (!snapshot.exists) return;
+
+      final dataToken = Map<String, dynamic>.from(snapshot.value as Map);
+
+      final tokens = <String>[];
+
+      for (final entry in dataToken.values) {
+        final token = entry['fcmToken'];
+        final userId = entry["userId"];
+        if (token != null && token is String && uid != userId) {
+          tokens.add(token);
+        }
+      }
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('group_fcm_tokens', tokens);
+      logger.d("💾 ${tokens.length} FCM token disimpan ke lokal");
+
+      await prefs.setString('uid', uid.toString());
+      await prefs.setString('display_name', user?.displayName ?? "");
+      await prefs.setString('uid', uid.toString());
+      await prefs.setString('group_id', groupId.toString());
+      logger.d("💾 $uid UID disimpan ke lokal");
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Pengaturan"),
@@ -56,7 +118,7 @@ class SettingPage extends HookConsumerWidget {
               CircleAvatar(
                 radius: 65,
                 backgroundImage: NetworkImage(
-                  member?["avatar"] ?? "https://avatar.vercel.sh/null",
+                  "https://avatar.vercel.sh/${firebaseAuth.currentUser?.uid}",
                 ),
               ),
               const SizedBox(height: 16),
@@ -98,7 +160,9 @@ class SettingPage extends HookConsumerWidget {
                           }
 
                           showLoadingDialog(context);
+                          await handleChangeKey();
                           await Future.delayed(Duration(seconds: 2));
+
                           await ref.read(voiceProvider.notifier).toggle(v);
                           WidgetsBinding.instance.addPostFrameCallback((
                             timeStamp,
@@ -143,23 +207,7 @@ class SettingPage extends HookConsumerWidget {
                                 return;
                               }
                               showLoadingDialog(context);
-                              final text = controller.text;
-                              await ref
-                                  .read(voiceProvider.notifier)
-                                  .setKeyword(text);
-
-                              if (voice.enabled) {
-                                await ref
-                                    .read(voiceProvider.notifier)
-                                    .toggle(false);
-                                await Future.delayed(
-                                  const Duration(seconds: 3),
-                                );
-                                await ref
-                                    .read(voiceProvider.notifier)
-                                    .toggle(true);
-                              }
-                              await Future.delayed(const Duration(seconds: 5));
+                              await handleChangeKey();
                               ref
                                   .read(toastServiceProvider)
                                   .showSuccess(

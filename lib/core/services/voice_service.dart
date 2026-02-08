@@ -1,16 +1,16 @@
 import 'dart:ui';
 
-import 'package:famora/core/providers/voice_provider.dart';
+// import 'package:famora/core/providers/voice_provider.dart';
 import 'package:famora/core/services/fcm_service.dart';
-import 'package:famora/core/services/location_service.dart';
+// import 'package:famora/core/services/location_service.dart';
 import 'package:famora/core/utils/logger.dart';
-import 'package:famora/firebase_options.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+// import 'package:famora/firebase_options.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
-import 'package:firebase_database/firebase_database.dart';
+// import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,7 +22,7 @@ void onStart(ServiceInstance service) async {
   logger.d('🔥 Service berhasil nyala!');
   DartPluginRegistrant.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   final speech = stt.SpeechToText();
   service.on('stop').listen((event) async {
@@ -30,18 +30,12 @@ void onStart(ServiceInstance service) async {
     service.stopSelf();
   });
   final available = await speech.initialize();
-
-  final uid = FirebaseAuth.instance.currentUser?.uid;
-  if (!available || uid == null) return;
-
-  final instance = FirebaseDatabase.instanceFor(
-    app: Firebase.app(),
-    databaseURL: dotenv.env['FIREBASE_DB_URL'],
-  );
-  final db = instance.ref();
+  final prefs = await SharedPreferences.getInstance();
+  final uid = prefs.getString("uid") ?? "";
+  if (!available) return;
 
   service.on('danger-detected').listen((event) async {
-    await handleDanger(service, db, uid);
+    await handleDanger(service, uid);
   });
   Future<bool> canSendNow() async {
     final prefs = await SharedPreferences.getInstance();
@@ -84,8 +78,10 @@ void onStart(ServiceInstance service) async {
 
             try {
               await markSentNow(); // 🔐 LOCK GLOBAL
+              final prefs = await SharedPreferences.getInstance();
               // await speech.stop();
-              await handleDanger(service, db, uid);
+              final uid = prefs.getString("uid") ?? "";
+              await handleDanger(service, uid);
             } finally {
               isProcessing = false;
               // logger.d("Set isProcessing to: false");
@@ -120,56 +116,50 @@ Future<(bool, String)> loadVoiceSetting() async {
 
 Future<void> handleDanger(
   ServiceInstance service,
-  DatabaseReference db,
+  // DatabaseReference db,
   String uid,
 ) async {
   try {
     logger.d("🚨 Kata kunci terdeteksi!");
 
-    final userSnapshot = await db
-        .child('members')
-        .orderByChild('userId')
-        .equalTo(uid)
-        .once();
+    logger.f("UID: $uid");
+    // final userSnapshot = await db.child('members/$uid').get();
 
-    logger.f("userSnapshot: $userSnapshot");
+    // logger.f("userSnapshot: ${userSnapshot.value}");
 
-    if (userSnapshot.snapshot.value == null) return;
+    // if (!userSnapshot.exists) return;
 
-    final userEntry = (userSnapshot.snapshot.value as Map).entries.first;
-    final groupId = userEntry.value['groupId'];
+    // final userEntry = (userSnapshot.snapshot.value as Map).entries.first;
+    // final data = Map<String, dynamic>.from(userSnapshot.value as Map);
+    // final groupId = data['groupId'];
 
-    final position = await getCurrentLocation();
+    // final membersSnapshot = await db.child('members').get();
 
-    await db.child("members").child(uid).update({
-      "status": "danger",
-      "timestamp": DateTime.now().toIso8601String(),
-      "lat": position.latitude,
-      "lng": position.longitude,
-    });
+    // final members = Map<String, dynamic>.from(membersSnapshot.value as Map);
+    // logger.f("ini member: ${members.values}");
+    final prefs = await SharedPreferences.getInstance();
+    final tokens = prefs.getStringList('group_fcm_tokens') ?? [];
 
-    await db.child("chats").push().set({
-      "from": FirebaseAuth.instance.currentUser?.displayName ?? "Anonymous",
-      "message": "Saya dalam Bahaya!",
-      "lat": position.latitude,
-      "lng": position.longitude,
-      "groupId": groupId,
-      "timestamp": DateTime.now().toIso8601String(),
-    });
+    logger.d("📦 Token lokal ditemukan: ${tokens.length}");
 
-    final membersSnapshot = await db.child('members').once();
-    final members = membersSnapshot.snapshot.value as Map;
-
-    for (final member in members.values) {
-      if (member['groupId'] == groupId &&
-          member['userId'] != uid &&
-          member['fcmToken'] != null) {
-        sendPushMessage(member['fcmToken']);
-      }
+    for (final token in tokens) {
+      logger.d("📦 mengirim ke $token");
+      await sendPushMessage(token);
     }
+    // for (final member in members.values) {
+    //   logger.f(member);
+    //   logger.f(groupId);
+    //   if (member['groupId'] == groupId &&
+    //       member['userId'] != uid &&
+    //       member['fcmToken'] != null) {
+    //     logger.d("Menelpon ${member['name']}");
+    //     sendPushMessage(member['fcmToken']);
+    //     logger.d("Berhasil Menelpon ${member['name']}");
+    //   }
+    // }
     service.invoke('voice:disable');
 
-    final prefs = await SharedPreferences.getInstance();
+    // final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('voice_enabled', false);
   } catch (e) {
     logger.e(e);
